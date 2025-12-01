@@ -1,6 +1,9 @@
+import './style.css';
+
 let current = '';
 let operator = '';
 let memory = 0;
+let expression = '';
 
 const display = document.getElementById('display') as HTMLOutputElement;
 
@@ -10,14 +13,17 @@ function updateDisplay(value: string) {
 
 function handleDigit(digit: string) {
   current += digit;
-  updateDisplay(current);
+  expression += digit;
+  updateDisplay(expression);
 }
 
 function handleOperator(op: string) {
   if (current === '') return;
   operator = op;
   memory = parseFloat(current);
+  expression += ` ${op} `;
   current = '';
+  updateDisplay(expression);
 }
 
 function calculate() {
@@ -31,7 +37,8 @@ function calculate() {
     case '^': result = Math.pow(memory, num); break;
   }
   current = result.toString();
-  updateDisplay(current);
+  expression = current;
+  updateDisplay(expression);
   operator = '';
 }
 
@@ -40,17 +47,18 @@ function handleAction(action: string) {
     case 'clear':
       current = '';
       operator = '';
+      expression = '';
       updateDisplay('0');
       break;
 
-    // Basic operators
+    // operators
     case 'add': handleOperator('+'); break;
     case 'subtract': handleOperator('−'); break;
     case 'multiply': handleOperator('×'); break;
     case 'divide': handleOperator('÷'); break;
     case 'equals': calculate(); break;
 
-    // Decimal point
+    // decimal point
     case 'decimal':
       if (!current.includes('.')) {
         current = current === '' ? '0.' : current + '.';
@@ -58,13 +66,20 @@ function handleAction(action: string) {
       }
       break;
 
-    // Memory functions
+    // memory functions
     case 'mc': memory = 0; break;
-    case 'mplus': memory += parseFloat(current || '0'); break;
-    case 'mminus': memory -= parseFloat(current || '0'); break;
-    case 'mr': current = memory.toString(); updateDisplay(current); break;
+    case 'mplus': memory += parseFloat(current || '0');
+      current = memory.toString();      
+        updateDisplay(current);            
+    break;
 
-    // Scientific functions
+case 'mminus':
+  memory -= parseFloat(current || '0');
+    current = memory.toString();       
+      updateDisplay(current);            
+  break;
+
+    // scientific functions
     case 'sqrt':
       current = Math.sqrt(parseFloat(current || '0')).toString();
       updateDisplay(current);

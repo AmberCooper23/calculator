@@ -99,7 +99,11 @@ button[data-action="tan"],
 button[data-action="log"],
 button[data-action="ln"],
 button[data-action="pi"],
-button[data-action="exp"] {
+button[data-action="exp"],
+button[data-action="open-bracket"],
+button[data-action="close-bracket"],
+button[data-action="euler"],
+button[data-action="random"] {
   background-color: rgb(255, 175, 27);
   color: white;
 }

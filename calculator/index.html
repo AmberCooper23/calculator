@@ -4,58 +4,60 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>calculator</title>
-<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-    
-        <script type="module" src="/src/main.ts" defer></script>
-
+    <title>Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <script type="module" src="/src/main.ts" defer></script>
+    <link rel="stylesheet" href="/src/style.css" />
   </head>
   <body>
-   <main class="calc">
-    <header>
-      <output id="display">
-        0
-      </output>
-    </header>
+    <main class="calc">
+      <header class="screen">
+        <output id="display">0</output>
+      </header>
 
-    <section class="buttons">
-      <button data-action="mc">MC</button>
-      <button data-action="mplus">M+</button>
-      <button data-action="mminus">M-</button>
-      <button data-action="clear">C</button>
+      <section class="buttons">
+        <button data-action="mc">MC</button>
+        <button data-action="mplus">M+</button>
+        <button data-action="mminus">M-</button>
+        <button data-action="clear">C</button>
 
 
-      <button data-action="sin">sin</button>
-      <button data-action="cos">cos</button>
-      <button data-action="tan">tan</button>
-      <button data-action="log">log</button>
-      <button data-action="sqrt">√</button>
-      <button data-action="pow">xʸ</button>
-      <button data-action="ln">ln</button>
-      <button data-action="pi">π</button>
+        <button data-action="sin">sin</button>
+        <button data-action="cos">cos</button>
+        <button data-action="tan">tan</button>
+        <button data-action="log">log</button>
 
-      <button>7</button>
-      <button>8</button>
-      <button>9</button>
-      <button data-action="divide"> ÷ </button>
+        <button data-action="sqrt">√</button>
+        <button data-action="pow">xʸ</button>
+        <button data-action="ln">ln</button>
+        <button data-action="pi">π</button>
 
-      <button>4</button>
-      <button>5</button>
-      <button>6</button>
-      <button data-action="multiply"> × </button>
-
-      <button>1</button>
-      <button>2</button>
-      <button>3</button>
-      <button data-action="subtract"> − </button>
-
-      <button data-action="equals">=</button>
-      <button>0</button>
-      <button data-action="decimal">.</button>
-      <button data-action="add"> + </button>
-    </section>
+        <button data-action="open-bracket">(</button>
+        <button data-action="close-bracket">)</button>
+        <button data-action="euler">e</button>
+        <button data-action="random"> Rand</button>
 
 
-   </main>
+        <button>7</button>
+        <button>8</button>
+        <button>9</button>
+        <button data-action="divide">÷</button>
+
+        <button>4</button>
+        <button>5</button>
+        <button>6</button>
+        <button data-action="multiply">×</button>
+
+        <button>1</button>
+        <button>2</button>
+        <button>3</button>
+        <button data-action="subtract">−</button>
+
+        <button data-action="equals">=</button>
+        <button>0</button>
+        <button data-action="decimal">.</button>
+        <button data-action="add">+</button>
+      </section>
+    </main>
   </body>
 </html>

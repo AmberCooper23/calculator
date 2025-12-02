@@ -1,4 +1,3 @@
-
 let current = '';
 let memory = 0;
 let expression = '';
@@ -35,7 +34,26 @@ function handleBracket(bracket: string) {
 }
 
 function tokenize(expr: string): string[] {
-  return expr.trim().split(/\s+/);
+  const raw = expr.trim().split(/\s+/);
+  const tokens: string[] = [];
+  for (let i = 0; i < raw.length; i++) {
+    const token = raw[i];
+    if (token === '−' || token === '-') {
+      if (
+        i === 0 ||
+        ['+', '−', '-', '×', '÷', '^', '('].includes(raw[i - 1])
+      ) {
+        const next = raw[i + 1];
+        if (next !== undefined && !isNaN(parseFloat(next))) {
+          tokens.push((-parseFloat(next)).toString());
+          i++;
+          continue;
+        }
+      }
+    }
+    tokens.push(token);
+  }
+  return tokens;
 }
 
 function precedence(op: string): number {
@@ -54,7 +72,6 @@ function isLeftAssociative(op: string): boolean {
 function toPostfix(tokens: string[]): string[] {
   const output: string[] = [];
   const stack: string[] = [];
-
   for (const token of tokens) {
     if (!isNaN(parseFloat(token))) {
       output.push(token);
@@ -70,6 +87,8 @@ function toPostfix(tokens: string[]): string[] {
         output.push(stack.pop()!);
       }
       stack.push(token);
+    } else if (['sin','cos','tan','log','ln'].includes(token)) {
+      stack.push(token);
     } else if (token === '(') {
       stack.push(token);
     } else if (token === ')') {
@@ -77,13 +96,14 @@ function toPostfix(tokens: string[]): string[] {
         output.push(stack.pop()!);
       }
       stack.pop();
+      if (stack.length && ['sin','cos','tan','log','ln'].includes(stack[stack.length - 1])) {
+        output.push(stack.pop()!);
+      }
     }
   }
-
   while (stack.length) {
     output.push(stack.pop()!);
   }
-
   return output;
 }
 
@@ -92,6 +112,22 @@ function evalPostfix(postfix: string[]): number {
   for (const token of postfix) {
     if (!isNaN(parseFloat(token))) {
       stack.push(parseFloat(token));
+    } else if (['sin','cos','tan','log','ln'].includes(token)) {
+      const a = stack.pop();
+      if (a === undefined) throw new Error();
+      switch (token) {
+        case 'sin': stack.push(Math.sin(a * Math.PI / 180)); break;
+        case 'cos': stack.push(Math.cos(a * Math.PI / 180)); break;
+        case 'tan': stack.push(Math.tan(a * Math.PI / 180)); break;
+        case 'log':
+          if (a <= 0) throw new Error();
+          stack.push(Math.log10(a));
+          break;
+        case 'ln':
+          if (a <= 0) throw new Error();
+          stack.push(Math.log(a));
+          break;
+      }
     } else {
       const b = stack.pop()!;
       const a = stack.pop()!;
@@ -129,17 +165,14 @@ function handleAction(action: string) {
       expression = '';
       updateDisplay('0');
       break;
-
     case 'add': handleOperator('+'); break;
     case 'subtract': handleOperator('−'); break;
     case 'multiply': handleOperator('×'); break;
     case 'divide': handleOperator('÷'); break;
     case 'pow': handleOperator('^'); break;
     case 'equals': calculate(); break;
-
     case 'open-bracket': handleBracket('('); break;
     case 'close-bracket': handleBracket(')'); break;
-
     case 'decimal':
       if (!current.includes('.')) {
         current = current === '' ? '0.' : current + '.';
@@ -147,7 +180,6 @@ function handleAction(action: string) {
         updateDisplay(expression);
       }
       break;
-
     case 'mc': memory = 0; break;
     case 'mplus':
       memory += parseFloat(current || '0');
@@ -159,50 +191,30 @@ function handleAction(action: string) {
       current = memory.toString();
       updateDisplay(current);
       break;
-
     case 'sqrt':
       current = Math.sqrt(parseFloat(current || '0')).toString();
       expression = current;
       updateDisplay(current);
       break;
     case 'sin':
-      current = Math.sin(parseFloat(current || '0')).toString();
-      expression = current;
-      updateDisplay(current);
+      expression += ' sin ( ';
+      updateDisplay(expression);
       break;
     case 'cos':
-      current = Math.cos(parseFloat(current || '0')).toString();
-      expression = current;
-      updateDisplay(current);
+      expression += ' cos ( ';
+      updateDisplay(expression);
       break;
     case 'tan':
-      current = Math.tan(parseFloat(current || '0')).toString();
-      expression = current;
-      updateDisplay(current);
+      expression += ' tan ( ';
+      updateDisplay(expression);
       break;
     case 'log':
-      const logVal = parseFloat(current || '0');
-      if (logVal <= 0) {
-        updateDisplay('Error');
-        current = '';
-        expression = '';
-      } else {
-        current = Math.log10(logVal).toString();
-        expression = current;
-        updateDisplay(current);
-      }
+      expression += ' log ( ';
+      updateDisplay(expression);
       break;
     case 'ln':
-      const lnVal = parseFloat(current || '0');
-      if (lnVal <= 0) {
-        updateDisplay('Error');
-        current = '';
-        expression = '';
-      } else {
-        current = Math.log(lnVal).toString();
-        expression = current;
-        updateDisplay(current);
-      }
+      expression += ' ln ( ';
+      updateDisplay(expression);
       break;
     case 'pi':
       const lastPi = expression.slice(-1);
@@ -212,7 +224,6 @@ function handleAction(action: string) {
       expression += Math.PI.toString();
       updateDisplay(expression);
       break;
-
     case 'euler':
       const lastE = expression.slice(-1);
       if (/\d/.test(lastE) || lastE === ')') {
@@ -221,15 +232,11 @@ function handleAction(action: string) {
       expression += Math.E.toString();
       updateDisplay(expression);
       break;
-
     case 'random':
       const rand = Math.random().toString();
-      const lastR = expression.slice(-1);
-      if (/\d/.test(lastR) || lastR === ')') {
-        expression += ' × ';
-      }
-      expression += rand;
-      updateDisplay(expression);
+      current = rand;
+      expression = rand;
+      updateDisplay(rand);
       break;
   }
 }

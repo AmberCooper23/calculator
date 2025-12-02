@@ -114,28 +114,32 @@ function evalPostfix(postfix: string[]): number {
       stack.push(parseFloat(token));
     } else if (['sin','cos','tan','log','ln'].includes(token)) {
       const a = stack.pop();
-      if (a === undefined) throw new Error();
+      if (a === undefined) throw new Error('Missing operand for function');
       switch (token) {
         case 'sin': stack.push(Math.sin(a * Math.PI / 180)); break;
         case 'cos': stack.push(Math.cos(a * Math.PI / 180)); break;
         case 'tan': stack.push(Math.tan(a * Math.PI / 180)); break;
         case 'log':
-          if (a <= 0) throw new Error();
+          if (a <= 0) throw new Error('Logarithm of non-positive number');
           stack.push(Math.log10(a));
           break;
         case 'ln':
-          if (a <= 0) throw new Error();
+          if (a <= 0) throw new Error('Natural log of non-positive number');
           stack.push(Math.log(a));
           break;
       }
     } else {
-      const b = stack.pop()!;
-      const a = stack.pop()!;
+      const b = stack.pop();
+      const a = stack.pop();
+      if (a === undefined || b === undefined) throw new Error('Missing operand');
       switch (token) {
         case '+': stack.push(a + b); break;
         case '−': stack.push(a - b); break;
         case '×': stack.push(a * b); break;
-        case '÷': stack.push(a / b); break;
+        case '÷':
+          if (b === 0) throw new Error('Undefined (division by zero)');
+          stack.push(a / b);
+          break;
         case '^': stack.push(Math.pow(a, b)); break;
       }
     }
@@ -143,20 +147,33 @@ function evalPostfix(postfix: string[]): number {
   return stack[0];
 }
 
+
 function calculate() {
   try {
     const tokens = tokenize(expression);
+    if (tokens.length === 0) throw new Error('Empty expression');
+
+    const openBrackets = tokens.filter(t => t === '(').length;
+    const closeBrackets = tokens.filter(t => t === ')').length;
+    if (openBrackets !== closeBrackets) throw new Error('Mismatched brackets');
+
     const postfix = toPostfix(tokens);
+    if (postfix.length === 0) throw new Error('Invalid expression');
+
     const result = evalPostfix(postfix);
+    if (isNaN(result)) throw new Error('Result is undefined');
+
     expression = result.toString();
     current = expression;
     updateDisplay(expression);
-  } catch {
-    updateDisplay('Error');
+  } catch (err) {
+    const message = (err instanceof Error && err.message) || 'Unknown error';
+    updateDisplay(message);
     expression = '';
     current = '';
   }
 }
+
 
 function handleAction(action: string) {
   switch (action) {

@@ -26,12 +26,17 @@ function handleOperator(op: string) {
 
 function handleBracket(bracket: string) {
   const last = expression.slice(-1);
-  if (bracket === '(' && (/\d/.test(last) || last === ')')) {
-    expression += ' × ';
+  if (bracket === '(') {
+    if (/\d/.test(last) || last === ')') {
+      expression += ' × ';
+    }
+    expression += '( ';
+  } else if (bracket === ')') {
+    expression += ' )';
   }
-  expression += ` ${bracket} `;
   updateDisplay(expression);
 }
+
 
 function tokenize(expr: string): string[] {
   const raw = expr.trim().split(/\s+/);
